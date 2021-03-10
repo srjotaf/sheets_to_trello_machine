@@ -28,9 +28,11 @@ SPREADSHEET_ID, KEY, TOKEN = gui.get_from_file()
 
 subsistemas = {
     'Baterias': 'red',
-    'Powertrain': 'yellow',
-    'Hardware': 'green',
-    'Software': 'sky'
+    'Powertrain': 'orange',
+    'Hardware': 'yellow',
+    'Software': 'green',
+    'Todos': 'black',
+    'Diretoria': 'blue'
 }
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,14 +230,14 @@ def post_card(list_id, name, due, macro, subsistema=None):
             }
         }
         requests.put(url, headers=headers, json=params)
-    if macro in labels:
-        url = f"https://api.trello.com/1/cards/{card['id']}/labels"
-        params = {
-            'key': KEY,
-            'token': TOKEN,
-            'color': labels[macro]
-        }
-        requests.post(url, params=params)
+    # if macro in labels:
+    #     url = f"https://api.trello.com/1/cards/{card['id']}/labels"
+    #     params = {
+    #         'key': KEY,
+    #         'token': TOKEN,
+    #         'color': labels[macro]
+    #     }
+    #     requests.post(url, params=params)
 
 
 def get_lists(id_board):
