@@ -5,10 +5,10 @@ from sheets_to_trello import *
 
 
 def update_command():
-    SPREADSHEET_ID, KEY, TOKEN = get_inputs().values()
+    SPREADSHEET_ID, RANGE_NAME, KEY, TOKEN, BOARD_NAME, LIST_NAME = get_inputs().values()
     message("Getting data from Trello")
     board_id = get_board_id(BOARD_NAME)
-    labels = get_labels(board_id)
+    # labels = get_labels(board_id)
     list_id = get_list_id(board_id, LIST_NAME)
 
     message("Getting data from Sheets")
@@ -20,14 +20,14 @@ def update_command():
 
     message("Posting new cards in Trello")
     print(data_from_sheets)
-    data_from_sheets.apply(lambda row: post_card(list_id, name=row['Micro-tarefa'], due=row['Entrega'],
-                                                 macro=row['Macro-Tarefa'], subsistema=row['Subsistema']), axis=1)
+    # data_from_sheets.apply(lambda row: post_card(list_id, name=row['Micro-tarefa'], due=row['Entrega'],
+    #  macro=row['Macro-Tarefa'], subsistema=row['Subsistema']), axis=1)
     message("All done")
 
 
 def message(text):
     message = tk.Label(mainWindow, text=text, relief='sunken', borderwidth=2)
-    message.grid(row=7, column=0, columnspan=2, sticky='nsew')
+    message.grid(row=13, column=0, columnspan=2, sticky='nsew')
 
 
 def get_from_file():
@@ -42,19 +42,29 @@ def get_from_file():
 
 def get_inputs():
     info_dict = {}
-    info_dict['spreadsheet_id'] = spreadsheet_id_entry.get()
-    info_dict['key'] = trello_key_entry.get()
-    info_dict['token'] = trello_token_entry.get()
+    try:
+        info_dict['spreadsheet_id'] = spreadsheet_id_entry.get()
+        info_dict['range_name'] = range_name_entry.get()
+        info_dict['key'] = trello_key_entry.get()
+        info_dict['token'] = trello_token_entry.get()
+        info_dict['board_name'] = board_name_entry.get()
+        info_dict['list_name'] = list_name_entry.get()
+    except NameError:
+        info_dict['spreadsheet_id'] = ''
+        info_dict['range_name'] = ''
+        info_dict['key'] = ''
+        info_dict['token'] = ''
+        info_dict['board_name'] = ''
+        info_dict['list_name'] = ''
 
     with open('infos.json', 'w') as write_file:
         json.dump(info_dict, write_file)
-
     return info_dict
 
 
 if __name__ == '__main__':
 
-    _id, _key, _token = get_from_file()
+    _id, _range, _key, _token, _board, _list = get_from_file()
 
     mainWindow = tk.Tk()
     mainWindow.title("Sheets To Trello Machine")
@@ -71,15 +81,25 @@ if __name__ == '__main__':
     spreadsheet_id_instructions.grid(row=0, column=1, sticky='nsew')
     spreadsheet_id_entry.grid(row=1, column=0, columnspan=2, sticky='nsew')
 
+    range_name_label = tk.Label(mainWindow, text="Range Name", relief='sunken', borderwidth=2)
+    range_name_instructions = tk.Label(mainWindow,
+                                       text="O intervalo do qual os dados serão usados. O termo antes do ponto de exclamação é a planilha\n usada (dentro de um arquivo pode haver várias planilhas/abas). O termo após o ponto de exclamação\n pode ser um intervalo nomeado ou o intervalo tradicional do tipo 'A2:E20'", relief='sunken', borderwidth=2)
+    range_name_entry = tk.Entry(mainWindow, relief='sunken', borderwidth=2)
+    range_name_entry.insert(0, _range)
+
+    range_name_label.grid(row=2, column=0, sticky='nsew')
+    range_name_instructions.grid(row=2, column=1, sticky='nsew')
+    range_name_entry.grid(row=3, column=0, columnspan=2, sticky='nsew')
+
     trello_key_label = tk.Label(mainWindow, text="Trello Key", relief='sunken', borderwidth=2)
     trello_key_instructions = tk.Label(mainWindow, text="A chave de sua conta no Trello. Para encontrar acesse\n"
                                        "https://trello.com/app-key", relief='sunken', borderwidth=2)
     trello_key_entry = tk.Entry(mainWindow, relief='sunken', borderwidth=2)
     trello_key_entry.insert(0, _key)
 
-    trello_key_label.grid(row=2, column=0, sticky='nsew')
-    trello_key_instructions.grid(row=2, column=1, sticky='nswe')
-    trello_key_entry.grid(row=3, column=0, columnspan=2, sticky='nsew')
+    trello_key_label.grid(row=4, column=0, sticky='nsew')
+    trello_key_instructions.grid(row=4, column=1, sticky='nswe')
+    trello_key_entry.grid(row=5, column=0, columnspan=2, sticky='nsew')
 
     trello_token_label = tk.Label(mainWindow, text="Trello Token", relief='sunken', borderwidth=2)
     trello_token_instructions = tk.Label(
@@ -87,12 +107,31 @@ if __name__ == '__main__':
     trello_token_entry = tk.Entry(mainWindow, relief='sunken', borderwidth=2)
     trello_token_entry.insert(0, _token)
 
-    trello_token_label.grid(row=4, column=0, sticky='nsew')
-    trello_token_instructions.grid(row=4, column=1, sticky='nsew')
-    trello_token_entry.grid(row=5, column=0, columnspan=2, sticky='nsew')
+    trello_token_label.grid(row=6, column=0, sticky='nsew')
+    trello_token_instructions.grid(row=6, column=1, sticky='nsew')
+    trello_token_entry.grid(row=7, column=0, columnspan=2, sticky='nsew')
+
+    board_name_label = tk.Label(mainWindow, text="Board Name", relief='sunken', borderwidth=2)
+    board_name_instructions = tk.Label(mainWindow,
+                                       text="O nome do Quadro em que as tarefas serão adicionadas.", relief='sunken', borderwidth=2)
+    board_name_entry = tk.Entry(mainWindow, relief='sunken', borderwidth=2)
+    board_name_entry.insert(0, _board)
+
+    board_name_label.grid(row=8, column=0, sticky='nsew')
+    board_name_instructions.grid(row=8, column=1, sticky='nsew')
+    board_name_entry.grid(row=9, column=0, columnspan=2, sticky='nsew')
+
+    list_name_label = tk.Label(mainWindow, text="List Name", relief='sunken', borderwidth=2)
+    list_name_instructions = tk.Label(mainWindow,
+                                      text="O nome da Lista em que as tarefas serão adicionadas.", relief='sunken', borderwidth=2)
+    list_name_entry = tk.Entry(mainWindow, relief='sunken', borderwidth=2)
+    list_name_entry.insert(0, _list)
+
+    list_name_label.grid(row=10, column=0, sticky='nsew')
+    list_name_instructions.grid(row=10, column=1, sticky='nsew')
+    list_name_entry.grid(row=11, column=0, columnspan=2, sticky='nsew')
 
     update_button = tk.Button(mainWindow, text='Update', command=update_command)
-    update_button.grid(row=6, column=1, sticky='se')
+    update_button.grid(row=12, column=1, sticky='se')
 
-    messages = tk.Label(mainWindow,)
     mainWindow.mainloop()

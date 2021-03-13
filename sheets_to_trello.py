@@ -13,18 +13,7 @@ import gui
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------
-# Aqui vão algumas variáveis cujos valores você deve preencher.
-
-# O intervalo do qual os dados serão usados. O termo antes do ponto de exclamação é a planilha usada (dentro de um arquivo pode haver várias planilhas/abas). O termo após o ponto de exclamação pode ser um intervalo nomeado ou o intervalo tradicional do tipo "A2:E20".
-RANGE_NAME = 'Página1!A1:E1000'
-
-# O nome do Quadro em que as tarefas serão adicionadas.
-BOARD_NAME = "Tarefas Elétrica"
-
-# O nome da Lista que as tarefas serão adicionadas.
-LIST_NAME = "BACKLOG"
-
-SPREADSHEET_ID, KEY, TOKEN = gui.get_from_file()
+SPREADSHEET_ID, RANGE_NAME, KEY, TOKEN, BOARD_NAME, LIST_NAME = gui.get_from_file()
 
 subsistemas = {
     'Baterias': 'red',
@@ -145,7 +134,7 @@ def get_board_id(board_name) -> str:
         'modelTypes': 'boards',
         'key': KEY,
         'token': TOKEN,
-        'query': {f'name:{BOARD_NAME}'}
+        'query': {f'name:{board_name}'}
     }
 
     url = f'https://api.trello.com/1/search'
@@ -305,7 +294,7 @@ def filtragem(data_from_sheets, board_id):
     return data_from_sheets[~data_from_sheets['Micro-tarefa'].isin(cards)]
 
 
-labels = get_labels(BOARD_NAME)
+# labels = get_labels(BOARD_NAME)
 
 
 if __name__ == '__main__':
